@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+	<!-- th:fragment="pagination" 다른 HTML에서 인클루드해서 사용하기 위함 -->
+	<!-- th:if 전체 데이터의 갯수가 1개 이상이면 페이지 번호 출력 -->
+	<!-- th:object 컨트롤러에서 전달받은 객체 *{} 표현식을 사용하여 멤버 변수에 접근할 수 있다 -->
+	<!-- th:with JSTL의 <c:set>과 마찬가지로 info라는 이름에 paginationInfo를 저장 -->
+	<nav th:fragment="pagination" th:if="${params != null and params.paginationInfo.totalRecordCount > 0}" th:object="${params.paginationInfo}" th:with="info=${params.paginationInfo}" aria-label="Page navigation" class="text-center">
+		<ul class="pagination">
+		
+			<li th:if="*{hasPreviousPage == true}" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${params.makeQueryString(1)} ]])">
+				<a href="javascript:void(0)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a> <!-- 이전 페이지가 존재하면 게시글 리스트에서 1페이지로 이동 -->
+			</li>
+			
+			<li th:if="*{hasPreviousPage == true}" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${params.makeQueryString(info.firstPage - 1)} ]])">
+				<a href="javascript:void(0)" aria-label="Previous"><span aria-hidden="true">&lsaquo;</span></a> <!-- 이전 페이지가 존재하면 게시글리스트에서 첫 페이지 번호 -1페이지로 이동 예를 들어 현재 페이지가 25이면 19페이지로 이동 -->
+			</li>
+			
+			<li th:each="pageNo : *{#numbers.sequence( firstPage, lastPage )}" th:class="${pageNo == params.currentPageNo} ? 'active'">
+				<a href="javascript:void(0)" th:text="${pageNo}" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${params.makeQueryString(pageNo)} ]])"></a>
+			<!-- *{#numbers(from, to, step)} 함수는 from에서 to까지 정수의 시퀀스를 생성하는 함수. 이 코드에는 from에는 첫 페이지 번호 to에는 마지막 페이지 번호여서 결국 pageSize를 뜻함 -->
+			<!-- th:class는 페이지 번호와 현재 페이지 번호가 동일하면 active 클래스를 적용함 -->
+			</li>
+			
+			<li th:if="*{hasNextPage == true}" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${params.makeQueryString(info.lastPage + 1)} ]])">
+				<a href="javascript:void(0)" aria-label="Next"><span aria-hidden="true">&rsaquo;</span></a>
+			<!-- 전체페이지 갯수(totalCountPage)는 전체데이터 갯수(totalRecordCount)를 통해 계산된 결과이다 -->
+			<!-- 즉, 존재하는 페이지 중 가장 마지막 페이지라고 생각할 수 있다 totalPageCount가 35라면 35페이지로 이동 -->
+			</li>
+			
+			<li th:if="*{hasNextPage == true}" th:onclick="movePage([[ ${#request.requestURI} ]], [[ ${params.makeQueryString(info.totalPageCount)} ]])">
+				<a href="javascript:void(0)" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+			<!-- movePage 함수 : $(#request.requestURI)는 요청 URI를 가지고 올 때 사용 여기서는 즉, /board/list.do를 반환 -->
+			<!-- ${params.makeQueryString(pageNo)}은 현재 페이지 번호, 페이지당 출력 데이터의 갯수, 하단의 출력할 페이지의 개수 정보를 쿼리 스트링 형태로 반환 -->
+			</li>
+			
+		</ul>
+	</nav>
+	
+	<!-- search -->
+	
+	<div th:fragment="search" id="adv-search" class="input-group">
+		<input type="text" id="mainSearchKeyword" class="form-control" th:value="${params.searchKeyword}" placeholder="키워드를 입력해 주세요." />
+		<div class="input-group-btn">
+			<div class="btn-group" role="group">
+				<div class="dropdown dropdown-lg">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></button>
+					<div class="dropdown-menu dropdown-menu-right" role="menu">
+						<!--/* 검색 form */-->
+						<form id="searchForm" th:action="@{/board/list.do}" method="get" th:onsubmit="return searchBoard(this)" class="form-horizontal" role="form">
+							<!-- /* 현재 페이지 번호, 페이지당 출력할 데이터 개수, 페이지 하단에 출력할 페이지 개수 Hidden 파라미터 */ -->
+							<!-- currentPageNo이 항상 1로 유지되어야 하는 이유 : 현재 페이지가 15인 상태에서 검색 버튼을 클릭하면 현재페이지가 1이 아닌 15페이지로 유지된다 -->
+							<input type="hidden" name="currentPageNo" value="1" />
+							<input type="hidden" name="recordsPerPage" th:value="${params.recordsPerPage}" />
+							<input type="hidden" name="pageSize" th:value="${params.pageSize}" />
+
+							<div class="form-group">
+								<label for="filter">검색 유형</label>
+								<select name="searchType" class="form-control">
+									<option value="" th:selected="${#strings.isEmpty( params.searchType )}">전체</option>
+									<option value="title" th:selected="${#strings.equals( params.searchType, 'title' )}">제목</option>
+									<option value="content" th:selected="${#strings.equals( params.searchType, 'content' )}">내용</option>
+									<option value="writer" th:selected="${#strings.equals( params.searchType, 'writer' )}">작성자</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="contain">키워드</label>
+								<input type="text" name="searchKeyword" class="form-control" th:value="${params.searchKeyword}" />
+							</div>
+							<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+						</form>
+					</div>
+				</div>
+				<button type="button" class="btn btn-primary" onclick="searchBoard(null)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+			</div>
+		</div>
+	</div>
+
+</html>

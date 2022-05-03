@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<body th:fragment="main-body">
+		<div class="fixed-navbar">
+			<div class="pull-left">
+				<h1 class="page-title">Board</h1>
+			</div>
+		</div>
+		<!-- /.fixed-navbar -->
+		<th:block layout:fragment="modal">
+			<div id="commentModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<form>
+								<div class="form-group">
+									<label for="modalWriter" class="col-form-label">작성자</label> <input type="text" id="modalWriter" class="form-control" placeholder="작성자를 입력해 주세요." />
+								</div>
+								<div class="form-group">
+									<label for="modalContent" class="col-form-label">내용</label>
+									<textarea id="modalContent" class="form-control" placeholder="내용을 입력해 주세요."></textarea>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" id="btnModalCancel" class="btn btn-default waves-effect waves-light" data-dismiss="modal">취소하기</button>
+							<button type="button" id="btnCommentUpdate" class="btn btn-primary waves-effect waves-light" onclick="updateComment()">수정하기</button>
+							<button type="button" id="btnCommentDelete" class="btn btn-danger waves-effect waves-light">삭제하기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</th:block>
+	
+		<div id="wrapper">
+			<div class="main-content">
+				<div class="row row-inline-block small-spacing">
+					<div class="col-xs-12">
+						<div class="box-content">
+							<div class="clearfix">
+								<h4 class="box-title pull-left"></h4>
+								<!-- /.box-title -->
+	
+								<th:block layout:fragment="search"></th:block>
+	
+							</div>
+							<!-- //.clearfix -->
+	
+							<th:block layout:fragment="content"></th:block>
+	
+							<th:block layout:fragment="paging"></th:block>
+						</div>
+						<!-- /.box-content -->
+						
+						<th:block layout:fragment="add-content"></th:block>
+
+					</div>
+					<!-- /.col-xs-12 -->
+				</div>
+				<!-- /.row row-inline-block small-spacing -->
+				<footer class="footer">
+					<ul class="list-inline">
+						<li>2016 © NinjaAdmin.</li>
+					</ul>
+				</footer>
+			</div>
+			<!-- /.main-content -->
+		</div>
+		<!-- /#wrapper -->
+
+		<script th:src="@{/scripts/jquery.min.js}"></script>
+		<script th:src="@{/plugin/bootstrap/js/bootstrap.min.js}"></script>
+		<script th:src="@{/plugin/mCustomScrollbar/jquery.mCustomScrollbar.concat.min.js}"></script>
+		<script th:src="@{/plugin/common/moment.js}"></script>
+		<script th:src="@{/scripts/main.js}"></script>
+		<script th:src="@{/scripts/common.js}"></script>
+
+		<th:block layout:fragment="script"></th:block>
+	</body>
+</html>

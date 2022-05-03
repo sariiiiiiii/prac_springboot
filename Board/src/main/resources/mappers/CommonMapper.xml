@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.CommonMapper">
+
+	<!-- MySQL 페이징 -->
+	<!-- BoardXML에서 selectBoardList LIMIT 구문과 동일 -->
+	<!-- 페이징 기능은 공통으로 사용하기 때문에 해당 SQL 조각을 인클루드 해서 사용합니다 -->
+	<sql id="paging">
+		LIMIT
+			#{paginationInfo.firstRecordIndex}, #{recordsPerPage}
+	</sql>
+	
+	<!-- MySQL 검색 -->
+	<sql id="search">
+		<!-- 검색 키워드가 파라미터로 넘어왔을 경우만 쿼리 실행 -->
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<choose>
+				<!-- 검색 유형이 파라미터로 넘어오면  -->
+				<when test="searchType != null and searchType != ''">
+					<choose> <!-- choose안에 있는 각각의 <when> 조건에 알맞은 검색 유형을 기준으로 LIKE 쿼리 실행 -->
+						<when test="'title'.equals(searchType)">
+							AND title LIKE CONCAT('%', #{searchKeyword}, '%')
+						</when>
+						<when test="'content'.equals(searchType)">
+							AND content LIKE CONCAT('%', #{searchKeyword}, '%')
+						</when>
+						<when test="'writer'.equals(searchType)">
+							AND writer LIKE CONCAT('%', #{searchKeyword}, '%')
+						</when>
+					</choose>
+				</when>
+				<!-- 검색 유형이 없을 때 -->
+				<otherwise> <!-- 즉 제목, 작성자, 내용 전체에서 검색 키워드만으로 검색 LIKE 쿼리 실행 -->
+					AND
+						(
+							   title LIKE CONCAT('%', #{searchKeyword}, '%')
+							OR content LIKE CONCAT('%', #{searchKeyword}, '%')
+							OR writer LIKE CONCAT('%', #{searchKeyword}, '%')
+						)
+				</otherwise>
+			</choose>
+		</if>
+	</sql>
+	
+</mapper>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head th:replace="board/fragments/header :: main-head"></head>
+	<body>
+		<form th:if="${not #maps.isEmpty( params )}" name="dataForm" th:action="${redirectUri}" th:method="${method}" style="display: none;">
+		<!-- 컨트롤러에서 받아온 4개의 파라미터중 params가 비어있지 않으면 -->
+			<input th:each="key, status : ${params.keySet()}" type="hidden" th:name="${key}" th:value="${params.get(key)}" />
+		<!-- Map에 담겨있는 key의 수만큼 hidden타입의 input태그 추가 -->
+		<!-- action 속성에는 redirect할 URI를 지정하고 method 속성에는 HTTP 요청 메소드를 지정 -->
+		</form>
+
+		<script th:src="@{/scripts/common.js}"></script>
+
+		<th:block layout:fragment="script">
+			<script th:inline="javascript">
+			/* <![CDATA[ */
+
+				window.onload = function() {
+					var message = /*[[ ${message} ]]*/;
+					if (isEmpty(message) == false) {
+						alert(message);
+					}
+
+					var params = /*[[ ${params} ]]*/;
+					if (isEmpty(params) == false) {
+						document.dataForm.submit();
+					} else {
+						var redirectUri = /*[[ ${redirectUri} ]]*/;
+						location.href = redirectUri;
+					}
+				}
+				/*[- end of onload -]*/
+
+			/* ]]> */
+			</script>
+		</th:block>
+	</body>
+</html>

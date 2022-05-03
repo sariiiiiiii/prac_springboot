@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="board/layout/basic">
+	<th:block layout:fragment="title">
+		<title>This page is a list page</title>
+	</th:block>
+
+	<th:block layout:fragment="search">
+		<div th:replace="board/fragments/common :: search"></div>
+	</th:block>
+
+	<th:block layout:fragment="content">
+		<div class="table-responsive clearfix">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>작성자</th>
+						<th>등록일</th>
+						<th>조회 수</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${not #lists.isEmpty( boardList )}" th:each="row : ${boardList}">
+						<td scope="row" th:text="${#strings.equals( row.noticeYn, 'Y' ) ? '공지' : row.idx}"></td> <!-- 공지 여부가 Y면 공지를 출력하고 아니면 게시글 번호를 출력  -->
+						<td class="text-left">
+							<!-- 타임리프에서 문자열을 연결하고 싶으면 수직선(|)으로 감싸야 한다. -->
+							<!-- makeQueryString 메소드는 Criteria 클래스의 멤버변수를 쿼리스트링(Query String)으로 반환한다. -->
+							<a th:href="|@{/board/view.do}${params.makeQueryString(params.currentPageNo)}&idx=${row.idx}|" th:text="${row.title}"></a>
+						</td>
+						<td th:text="${row.writer}"></td>
+						<td th:text="${#temporals.format( row.insertTime, 'yyyy-MM-dd' )}"></td> <!-- 함수에 맞춰서 원하는 날짜형태로 포맷할 수 있다 -->
+						<td th:text="${row.viewCnt}"></td>
+					</tr>
+					<tr th:unless="${not #lists.isEmpty( boardList )}"> <!-- 일반 else와는 달리 if문과 동일한 문구가 들어가야 한다(unless 자체가 부정의 의미라고 생각해야 겠다 -->
+						<td colspan="5">조회된 결과가 없습니다.</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="btn_wrap text-right">
+				<a th:href="@{/board/write.do}" class="btn btn-primary waves-effect waves-light">Write</a>
+			</div>
+
+			<th:block layout:fragment="paging">
+				<nav th:replace="board/fragments/common :: pagination"></nav>
+			</th:block>
+		</div>
+	</th:block>
+	
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+		
+			/*<![CDATA[*/
+
+			function movePage(uri, queryString){
+				location.href = uri + queryString;
+				console.log(uri + queryString);
+			}
+			
+			function searchBoard(form) {
+				/*[- 드롭다운이 아닌 메인 검색 키워드로 검색했을 때 -]*/
+				if (isEmpty(form) == true) {
+					var searchKeyword = document.getElementById("mainSearchKeyword");
+					if (isEmpty(searchKeyword.value) == true) {
+						alert("키워드를 입력해 주세요.");
+						searchKeyword.focus();
+						return false;
+					}
+
+					form = document.getElementById("searchForm");
+					form.searchKeyword.value = searchKeyword.value;
+					form.submit();
+				}
+
+				/* 드롭다운의 검색은 이미 폼 태그로 감싸져 있으며 버튼타입의 submit으로 지정되어 있기 때문에 별 다른 처리 없이 컨트롤러로 폼 데이터를 전송한다 */
+				if (isEmpty(form.searchKeyword.value) == true) {
+					alert("키워드를 입력해 주세요.");
+					form.searchKeyword.focus();
+					return false;
+				}
+			}
+			
+			
+			
+			
+				
+			/*]]*/
+		
+		</script>
+	</th:block>
+	
+</html>
