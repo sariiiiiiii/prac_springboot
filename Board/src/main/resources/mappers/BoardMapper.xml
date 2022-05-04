@@ -18,8 +18,11 @@
 		, update_time
 		, delete_time
 	</sql>
-
-	<insert id="insertBoard" parameterType="BoardDTO">
+	
+	
+	<!-- Oracle selectKey와 같은 기능 -->
+	<!-- useGeneratedKeys를 true로 지정하면 INSERT 쿼리의 실행과 동시에 생성된 PK가 파라미터로 전달된 객체 즉, BoardDTO 클래스의 객체인 params의 게시글 번호(idx)에 담기게 됩니다 -->
+	<insert id="insertBoard" parameterType="BoardDTO" useGeneratedKeys="true" keyProperty="idx">
 		INSERT INTO tb_board (
 			<include refid="boardColumns" />
 		) VALUES (

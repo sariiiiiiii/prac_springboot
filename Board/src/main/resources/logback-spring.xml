@@ -17,7 +17,7 @@
 	<!-- Logger -->
 	<!-- 로그를 출력하는 요소로, level 속성을 통해 출력할 로그의 레벨을 조절하여 appender에 전달 -->
 	<!-- 첫번째 logger에서 com.board는 src/main/java 디렉터리 안의 자바 패키지 경로를 의미합니다. -->
-	<!-- 레벱의 관한 정리 : https://congsong.tistory.com/23?category=749196 -->
+	<!-- level의 관한 정리 : https://congsong.tistory.com/23?category=749196 -->
 	<logger name="com.board" level="DEBUG" appender-ref="console" />
 	<logger name="jdbc.sqlonly" level="INFO" appender-ref="console-infolog" />
 	<logger name="jdbc.resultsettable" level="INFO" appender-ref="console-infolog" />
